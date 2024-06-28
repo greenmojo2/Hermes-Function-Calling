@@ -1,0 +1,2 @@
+2024-06-25:20:39:40,518 INFO     [functioncall.py:22] None
+2024-06-25:20:39:41,188 INFO     [functioncall.py:34] {'bos_token': '<|begin_of_text|>', 'eos_token': '<|im_end|>', 'pad_token': '<|im_end|>'}

@@ -1,0 +1,4 @@
+2024-06-25:20:07:32,676 INFO     [functioncall.py:22] None
+2024-06-25:20:07:34,689 INFO     [functioncall.py:34] {'bos_token': '<|begin_of_text|>', 'eos_token': '<|im_end|>', 'pad_token': '<|im_end|>'}
+2024-06-25:20:07:35,121 ERROR    [functioncall.py:80] Failed to get response from Ollama API: 404
+2024-06-25:20:07:35,122 ERROR    [functioncall.py:141] Exception occurred: Failed to get response from Ollama API: 404

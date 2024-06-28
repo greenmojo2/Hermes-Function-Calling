@@ -1,0 +1,4 @@
+2024-06-25:20:29:32,847 INFO     [functioncall.py:22] None
+2024-06-25:20:29:33,507 INFO     [functioncall.py:34] {'bos_token': '<|begin_of_text|>', 'eos_token': '<|im_end|>', 'pad_token': '<|im_end|>'}
+2024-06-25:20:34:56,184 INFO     [utils.py:89] No match found for the assistant pattern
+2024-06-25:20:39:14,567 WARNING  [functioncall.py:50] Assistant message is None

@@ -1,9 +1,12 @@
 import argparse
-# import torch
+import torch
 import json
-import requests
 
-from transformers import AutoTokenizer
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig
+)
 
 import functions
 from prompter import PromptManager
@@ -21,8 +24,24 @@ class ModelInference:
     def __init__(self, model_path, chat_template, load_in_4bit):
         inference_logger.info(print_nous_text_art())
         self.prompter = PromptManager()
+        self.bnb_config = None
 
-        # Load tokenizer only
+        if load_in_4bit == "True":
+            self.bnb_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+            )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            return_dict=True,
+            quantization_config=self.bnb_config,
+            torch_dtype=torch.float16,
+            attn_implementation="flash_attention_2",
+            device_map="auto",
+        )
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = "left"
@@ -31,6 +50,8 @@ class ModelInference:
             print("No chat template defined, getting chat_template...")
             self.tokenizer.chat_template = get_chat_template(chat_template)
         
+        inference_logger.info(self.model.config)
+        inference_logger.info(self.model.generation_config)
         inference_logger.info(self.tokenizer.special_tokens_map)
 
     def process_completion_and_validate(self, completion, chat_template):
@@ -61,25 +82,22 @@ class ModelInference:
         return results_dict
     
     def run_inference(self, prompt):
-        url = "http://192.168.8.17:8080/api/chat"
-        headers = {"Content-Type": "application/json"}
-        data = {
-            "model": "interstellarninja/hermes-2-theta-llama-3-8b:latest",  # Replace with the actual model name
-            "prompt": prompt,
-            "max_new_tokens": 1500,
-            "temperature": 0.8,
-            "repetition_penalty": 1.1,
-            "do_sample": True,
-            "eos_token_id": self.tokenizer.eos_token_id
-        }
+        inputs = self.tokenizer.apply_chat_template(
+            prompt,
+            add_generation_prompt=True,
+            return_tensors='pt'
+        )
 
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code == 200:
-            completion = response.json().get("completion", "")
-            return completion
-        else:
-            inference_logger.error(f"Failed to get response from Ollama API: {response.status_code}")
-            raise Exception(f"Failed to get response from Ollama API: {response.status_code}")
+        tokens = self.model.generate(
+            inputs.to(self.model.device),
+            max_new_tokens=1500,
+            temperature=0.8,
+            repetition_penalty=1.1,
+            do_sample=True,
+            eos_token_id=self.tokenizer.eos_token_id
+        )
+        completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
+        return completion
 
     def generate_function_call(self, query, chat_template, num_fewshot, max_depth=5):
         try:

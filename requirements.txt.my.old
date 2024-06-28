@@ -1,0 +1,13 @@
+# localai_api_fn_calling.ipynb
+openai==0.28
+# instructor_ollama.ipynb
+instructor
+#ollama-multiple-fn.ipynp
+ollama
+#functioncall
+langchain-community
+langchain # maybe not needed
+pandas
+yfinance
+art
+jsonschema

@@ -1,0 +1,2 @@
+2024-06-25:19:47:53,337 INFO     [functioncall.py:19] None
+2024-06-25:19:47:53,669 ERROR    [functioncall.py:103] Exception occurred: 'Ollama' object has no attribute 'apply_chat_template'

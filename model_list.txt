@@ -1,0 +1,16 @@
+
+
+
+192.168.8.17
+interstellarninja/hermes-2-theta-llama-3-8b:latest
+mistral:7b
+gemma:7b
+mistral:latest
+nomic-embed-text:latest
+llama3:latest
+
+
+192.168.8.20
+mistral:7b
+starcoder2:instruct
+dolphin-mistral:latest
